@@ -22,6 +22,11 @@ const VideoCarousel = () => {
     const [loadedData, setLoadedData] = useState([]);
     const { isEnd, startPlay, videoId, isLastVideo, isPlaying } = video;
     useGSAP(() => {
+        gsap.to('#slide', {
+            transform: `translateX(${-100 * videoId}%)`,
+            duration: 2,
+            ease: 'power2.inOut'
+        })
         gsap.to('#video', {
             scrollTrigger: {
                 trigger: '#video',
@@ -62,6 +67,7 @@ const VideoCarousel = () => {
                             width: `${currentProgress}%`,
                             backgroundColor: 'white'
                         })
+                        
                     }
 
                 },
@@ -72,6 +78,7 @@ const VideoCarousel = () => {
 
         }
     }, [videoId, startPlay])
+
     const handleProcess = (type, i) => {
         switch (type) {
             case 'video-end':
@@ -86,6 +93,10 @@ const VideoCarousel = () => {
             case 'play':
                 setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
                 break;
+            case 'pause':
+                setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
+                break;
+
             default:
                 return video;
         }
@@ -98,9 +109,15 @@ const VideoCarousel = () => {
                     <div key={list.id} id='slider' className='sm:pr-20 pr-10'>
                         <div className='video-carousel_container'>
                             <div className='w-full h-full flex-center rounded-3xl overflow-hidden bg-black' >
-                                <video id='video' playsInline={true} preload='auto' muted ref={(el) => (videoRef.current[i] = el)} onPlay={() => {
-                                    setVideo((prevVideo) => ({ ...prevVideo, isPlaying: true }))
-                                }}
+                                <video id='video' playsInline={true} preload='auto' muted ref={(el) => (videoRef.current[i] = el)}
+                                    className={`${list.id === 2 && 'translate-x-44'
+                                        } pointer-events-none`}
+                                    onEnded={() =>
+                                        i !== 3 ? handleProcess('video-end', i) : handleProcess('video-last')
+                                    }
+                                    onPlay={() => {
+                                        setVideo((prevVideo) => ({ ...prevVideo, isPlaying: true }))
+                                    }}
                                     onLoadedMetadata={(e) => handleLoadedMetadata(i, e)}
                                 >
                                     <source src={list.video} type='video/mp4' />
