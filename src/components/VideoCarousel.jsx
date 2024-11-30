@@ -57,46 +57,71 @@ const VideoCarousel = () => {
             let anim = gsap.to(span[videoId], {
                 onUpdate: () => {
                     const progress = Math.ceil(anim.progress() * 100);
-                    if (progress != currentProgress) {
+                    if (progress !== currentProgress) {
                         currentProgress = progress;
                         gsap.to(videoDivRef.current[videoId], {
                             width: window.innerWidth < 760 ? '10vh' : window.innerWidth < 1200 ? '10vw' : '4vw',
-
-                        })
+                        });
                         gsap.to(span[videoId], {
                             width: `${currentProgress}%`,
                             backgroundColor: 'white'
-                        })
-                        
+                        });
                     }
-
                 },
                 onComplete: () => {
-
+                    if (isPlaying) {
+                        gsap.to(videoDivRef.current[videoId], {
+                            width: '12px'
+                        });
+                        gsap.to(span[videoId], {
+                            backgroundColor: '#afafaf'
+                        });
+                    }
                 }
-            })
+            });
 
+            if (videoId === 0) {
+                anim.restart();
+            }
+
+            const animUpdate = () => {
+                const videoElement = videoRef.current[videoId];
+                if (videoElement) {
+                    anim.progress(videoElement.currentTime / hightlightsSlides[videoId].videoDuration);
+                }
+            };
+
+            if (isPlaying) {
+                gsap.ticker.add(animUpdate);
+            } else {
+                gsap.ticker.remove(animUpdate);
+            }
         }
-    }, [videoId, startPlay])
+    }, [videoId, startPlay]);
 
     const handleProcess = (type, i) => {
         switch (type) {
             case 'video-end':
-                setVideo((prev) => ({ ...prev, isEnd: true, videoId: i + 1 }))
+                setVideo((prev) => ({ 
+                    ...prev, 
+                    isEnd: true, 
+                    videoId: i + 1, 
+                    isPlaying: true
+                }));
                 break;
             case 'video-last':
-                setVideo(prev => ({ ...prev, isLastVideo: true }))
+                setVideo(prev => ({ ...prev, isLastVideo: true }));
                 break;
             case 'video-reset':
-                setVideo(prev => ({ ...prev, isEnd: false, isLastVideo: false, videoId: 0 }))
+                setVideo(prev => ({ ...prev, isEnd: false, isLastVideo: false, videoId: 0 }));
                 break;
             case 'play':
-                setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
+                setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
                 break;
             case 'pause':
-                setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
+                setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
                 break;
-
+            c
             default:
                 return video;
         }
@@ -106,7 +131,7 @@ const VideoCarousel = () => {
         <>
             <div className='flex items-center'>
                 {hightlightsSlides.map((list, i) => (
-                    <div key={list.id} id='slider' className='sm:pr-20 pr-10'>
+                    <div key={list.id} id='slide' className='sm:pr-20 pr-10'>
                         <div className='video-carousel_container'>
                             <div className='w-full h-full flex-center rounded-3xl overflow-hidden bg-black' >
                                 <video id='video' playsInline={true} preload='auto' muted ref={(el) => (videoRef.current[i] = el)}
