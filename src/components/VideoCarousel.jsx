@@ -39,30 +39,32 @@ const VideoCarousel = () => {
                 setVideo(prev => ({ ...prev, startPlay: true, isPlaying: true }))
             }
         })
-    }, [isEnd, videoId])
+    }, [isEnd, videoId]) //Depend on isEnd and videoId
     //Get video duration and set to list
     const handleLoadedMetadata = (i, e) => {
         setLoadedData((pre) => [...pre, e])
     }
     useEffect(() => {
+        //Check if video is loaded 
         if (loadedData.length > 3) {
             if (!isPlaying) {
-                videoRef.current[videoId].pause();
+                videoRef.current[videoId].pause(); //Pause video
             }
             else {
-                startPlay && videoRef.current[videoId].play();
+                startPlay && videoRef.current[videoId].play(); //Play video if startPlay is true
             }
         }
-    }, [startPlay, videoId, isPlaying, loadedData])
+    }, [startPlay, videoId, isPlaying, loadedData]) //Depend on startPlay, videoId, isPlaying, loadedData
     useEffect(() => {
         let currentProgress = 0;
         let span = videoSpanRef.current;
         if (span[videoId]) {
             let anim = gsap.to(span[videoId], {
                 onUpdate: () => {
-                    const progress = Math.ceil(anim.progress() * 100);
+                    const progress = Math.ceil(anim.progress() * 100); //Calculate progress
                     if (progress !== currentProgress) {
                         currentProgress = progress;
+                        //Change size and color of video progress
                         gsap.to(videoDivRef.current[videoId], {
                             width: window.innerWidth < 760 ? '10vh' : window.innerWidth < 1200 ? '10vw' : '4vw',
                         });
@@ -85,19 +87,22 @@ const VideoCarousel = () => {
             });
 
             if (videoId === 0) {
-                anim.restart();
+                anim.restart(); //Restart animation when video is first
             }
 
             const animUpdate = () => {
                 const videoElement = videoRef.current[videoId];
                 if (videoElement) {
+                    //Update progress of video depend on video duration
                     anim.progress(videoElement.currentTime / hightlightsSlides[videoId].videoDuration);
                 }
             };
 
             if (isPlaying) {
+                //Update progress of video
                 gsap.ticker.add(animUpdate);
             } else {
+                //Remove animation when video is not playing
                 gsap.ticker.remove(animUpdate);
             }
         }
