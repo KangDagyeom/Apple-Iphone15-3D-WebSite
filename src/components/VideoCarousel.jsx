@@ -9,15 +9,16 @@ import { useGSAP } from '@gsap/react';
 gsap.registerPlugin(ScrollTrigger);
 
 const VideoCarousel = () => {
-    const videoRef = useRef([]);
+    const videoRef = useRef([]); //Like a video list
     const videoSpanRef = useRef([]);
     const videoDivRef = useRef([]);
+    // Video state
     const [video, setVideo] = useState({
-        isEnd: false,
-        startPlay: false,
-        videoId: 0,
-        isLastVideo: false,
-        isPlaying: false,
+        isEnd: false, //Current video is end ?
+        startPlay: false, //Current video is playing ?
+        videoId: 0, //Current video id 
+        isLastVideo: false, //Last video ?
+        isPlaying: false, //Current video is playing ?
     });
     const [loadedData, setLoadedData] = useState([]);
     const { isEnd, startPlay, videoId, isLastVideo, isPlaying } = video;
@@ -30,13 +31,16 @@ const VideoCarousel = () => {
         gsap.to('#video', {
             scrollTrigger: {
                 trigger: '#video',
-                toggleActions: 'restart none none none',
+                //onEnter, onLeave, onEnterBack, onLeaveBack
+                toggleActions: 'restart pause reverse none',
             },
+            //When video is playing, set startPlay and isPlaying to true
             onUpdate: () => {
                 setVideo(prev => ({ ...prev, startPlay: true, isPlaying: true }))
             }
         })
     }, [isEnd, videoId])
+    //Get video duration and set to list
     const handleLoadedMetadata = (i, e) => {
         setLoadedData((pre) => [...pre, e])
     }
@@ -100,15 +104,18 @@ const VideoCarousel = () => {
     }, [videoId, startPlay]);
 
     const handleProcess = (type, i) => {
+        //prev is current video state, not a variable
+        //...prev is spread current value of video state
         switch (type) {
             case 'video-end':
-                setVideo((prev) => ({ 
-                    ...prev, 
-                    isEnd: true, 
-                    videoId: i + 1, 
+                setVideo((prev) => ({
+                    ...prev,
+                    isEnd: true,
+                    videoId: i + 1,
                     isPlaying: true
                 }));
                 break;
+            //
             case 'video-last':
                 setVideo(prev => ({ ...prev, isLastVideo: true }));
                 break;
@@ -121,7 +128,7 @@ const VideoCarousel = () => {
             case 'pause':
                 setVideo(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
                 break;
-            c
+
             default:
                 return video;
         }
