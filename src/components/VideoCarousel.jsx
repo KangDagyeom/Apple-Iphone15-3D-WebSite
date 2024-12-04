@@ -32,7 +32,7 @@ const VideoCarousel = () => {
             scrollTrigger: {
                 trigger: '#video',
                 //onEnter, onLeave, onEnterBack, onLeaveBack
-                toggleActions: 'restart pause reverse none',
+                toggleActions: 'restart none none none',
             },
             //When video is playing, set startPlay and isPlaying to true
             onUpdate: () => {
